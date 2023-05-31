@@ -3,7 +3,7 @@ async function getUsers() {
 	let users = [];
 	try {
 		let req = await UrlFetchApp.fetch(
-			PropertiesService.getScriptProperties().getProperty("baseUrl") +
+			baseUrl +
 				"users?per_page=50",
 			{
 				method: "GET", // *GET, POST, PUT, DELETE, etc.
@@ -80,13 +80,7 @@ function aircallConfiguration() {
 			email: "email 3",
 			aircall_id: "id 3",
 			number_id: "number id 3",
-		},
-		{
-			name: "Koen Verduijn",
-			email: "koen.verduijn+demo@aircall.io",
-			aircall_id: "731416",
-			number_id: "397375",
-		},
+		}
 	]);
 };
 

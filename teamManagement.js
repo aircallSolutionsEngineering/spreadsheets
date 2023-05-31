@@ -230,6 +230,6 @@ function cellChange() {
 			languageTab
 				.getRange(3, teamColumn + 4, languageTab.getLastRow() - 3, 1)
 				.setValue("Logged Out");
-		}
-	}
-}
+		};
+	};
+};

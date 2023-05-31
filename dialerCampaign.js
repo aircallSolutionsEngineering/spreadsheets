@@ -48,7 +48,6 @@ async function createDialerCampaign() {
   try {
     const allUsers = await getUsers();
     // Logger.log(allUsers);
-    activeUserEmail = 'koen.verduijn+demo@aircall.io'; // !!!remove only test account !!! 
     for(u = 0; u < allUsers.length; u++) {
       // Logger.log(allUsers[u].email);
       if(allUsers[u].email.toString() === activeUserEmail.toString()) {

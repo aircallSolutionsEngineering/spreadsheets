@@ -1,19 +1,19 @@
 // scheduler to work with the Apps trigger
 function triggerAircallCallData() {
 	/* get specific date range */
-	const dateFrom = new Date("2023-04-11").getTime() / 1000;
-	const dateTo = new Date("2023-04-13").getTime() / 1000;
-	Logger.log("from: " + dateFrom.toString() + " to:" + dateTo);
-	getAll("calls", dateFrom, dateTo, false);
+	// const dateFrom = new Date("2023-04-11").getTime() / 1000;
+	// const dateTo = new Date("2023-04-13").getTime() / 1000;
+	// Logger.log("from: " + dateFrom.toString() + " to:" + dateTo);
+	// getAll("calls", dateFrom, dateTo, false);
 	/* get interval data */
-	// let dateTimeNowInSeconds = Math.floor(Date.now() / 1000);
-	// const dateTimeNowMinus1DayInSeconds = dateTimeNowInSeconds - (60 * 60 * 24);
-	// // Logger.log('Now: '+dateTimeNowInSeconds+' minus 1 hour: '+dateTimeNowMinus1HourInSeconds);
-	// const dateTimeNowFormat = new Date(dateTimeNowInSeconds);
-	// const dateTimeNowDay = dateTimeNowFormat.getDay();
-	// const dateTimeNowHour = dateTimeNowFormat.getHours();
-	// if(dateTimeNowDay == 1 && dateTimeNowHour == 0) getAll('calls',dateTimeNowMinus1DayInSeconds,dateTimeNowInSeconds,false);
-	// else getAll('calls',dateTimeNowMinus1DayInSeconds,dateTimeNowInSeconds,false);
+	let dateTimeNowInSeconds = Math.floor(Date.now() / 1000);
+	const dateTimeNowMinus1DayInSeconds = dateTimeNowInSeconds - (60 * 60 );
+	// Logger.log('Now: '+dateTimeNowInSeconds+' minus 1 hour: '+dateTimeNowMinus1HourInSeconds);
+	const dateTimeNowFormat = new Date(dateTimeNowInSeconds);
+	const dateTimeNowDay = dateTimeNowFormat.getDay();
+	const dateTimeNowHour = dateTimeNowFormat.getHours();
+	if(dateTimeNowDay == 1 && dateTimeNowHour == 0) getAll('calls',dateTimeNowMinus1DayInSeconds,dateTimeNowInSeconds,true);
+	else getAll('calls',dateTimeNowMinus1DayInSeconds,dateTimeNowInSeconds,false);
 }
 
 // generic API GET request to all Aircall objects

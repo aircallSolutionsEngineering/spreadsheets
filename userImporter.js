@@ -1,3 +1,4 @@
+// grab user data from cells
 async function getUserData() {
 	const userTab = SpreadsheetApp.getActive().getSheetByName("Users");
 	const userData = userTab
@@ -16,6 +17,7 @@ async function getUserData() {
 	}
 }
 
+// create users in Aircall via API
 async function createRecord(object, record) {
 	if (object != "user" && object != "tag" && object != "contact")
 		ui.alert("please provide correct object. " + object + " is not valid");
@@ -41,6 +43,6 @@ async function createRecord(object, record) {
 			ui.alert("Error in creating user: " + res.getContentText());
 		else {
 			return res.getContentText();
-		}
-	}
-}
+		};
+	};
+};

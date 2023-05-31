@@ -232,6 +232,7 @@
           data.tags = document.querySelector('input[id="object-tags"]').checked;
           data.numbers = document.querySelector('input[id="object-numbers"]').checked;
           console.log(data);
+          // reference to google apps script name
           google.script.run.dataRequest(data);
         };
       </script>  
