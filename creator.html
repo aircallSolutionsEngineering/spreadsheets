@@ -1,0 +1,98 @@
+<!-- html form to handle create, update, delete -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      html { font-family: 'sans-serif' }
+      label { color:green }
+    </style>
+  </head>
+  <body>
+    <div id="buttons">
+      <button id="buttonTag" type="button" onclick="showForms('tag')">Tag</button>
+      <button id="buttonUser" type="button" onclick="showForms('user')">User</button>
+      <button id="buttonContact" type="button" onclick="showForms('contact')">Contact</button>
+    </div>
+    <form id="tagForm" style="display:none">
+      <label for="tagName">Name</label><input id="tagName" type="text" value="" required/>
+      <label for="tagColor">Color</label><input id="tagColor" type="color" value="Test" required/>
+      <label for="tagDescription">Description</label><input id="tagDescription" type="text" value="" />
+      <input id="tagCreate" type="button" value="Create" onclick="collectData('tag')" />
+    </form>
+    <form id="userForm" style="display:none">
+      <div><label for="userEmail">Email</label><input id="userEmail" type="email" value="@aircall.io" required/></div>
+      <div><label for="userFirstName">FirstName</label><input id="userFirstName" type="text" value="Test" required/></div>
+      <div><label for="userLastName">LastName</label><input id="userLastName" type="text" value="" required/></div>
+      <div><label for="userAvailability">Availability</label><input id="userAvailability" type="text" value="" /></div>
+      <div><label for="userAdmin">Admin</label><input id="userAdmin" type="boolean" value=false /></div>
+      <div><label for="userTimeZone">TimeZone</label><input id="userTimeZone" type="text" /></div>
+      <div><label for="userLanguage">Language</label><input id="userLanguage" type="text" /></div>
+      <div><label for="userWUT">WUT</label><input id="userWUT" type="text" /></div>
+      <div><input id="userCreate" type="button" value="Create" onclick="collectData('user')" /></div>
+    </form>
+    <form id="contactForm" style="display:none">
+      <div><label for="contactFirstName">FirstName</label><input id="contactFirstName" type="text" value="Test" required/></div>
+      <div><label for="contactLastName">LastName</label><input id="contactLastName" type="text" value="" required/></div>
+      <div><label for="contactCompanyName">Company Name</label><input id="contactCompanyName" type="text" value="" /></div>
+      <div><label for="contactInformation">Information</label><input id="contactInformation" type="text" value="" /></div>
+      <div>
+        <div><label for="contactEmailLabel">Email Label</label><input id="contactEmailLabel" type="text" value="" /></div>
+        <div><label for="contactEmailValue">Email</label><input id="contactEmailValue" type="email" value="@aircall.io" /></div>
+      </div>
+      <div>
+        <label for="contactPhoneLabel">Phone Label</label><input id="contactPhoneLabel" type="text" required/>
+        <label for="contactPhoneValue">Phone Numbers</label><input id="contactPhoneValue" type="text" required/>
+      </div>
+      <div><input id="contactCreate" type="button" value="Create" onclick="collectData('contact')" /></div>
+    </form>
+  </body>
+  <script>
+    async function collectData(object) {
+      if(object != "user" && object != "tag" && object != "contact") alert("please fill in the correct object!");
+      else {
+        let payload = {};
+        if(object == "tag") {
+          payload.name = document.getElementById('tagName').value;
+          payload.color = document.getElementById('tagColor').value;
+          payload.description = document.getElementById('tagDescription').value;
+        } else if(object == "user") {
+          payload.email = document.getElementById('userEmail').value;
+          payload.firstName = document.getElementById('userFirstName').value;
+          payload.lastName = document.getElementById('userLastName').value;
+          payload.availability = document.getElementById('userAvailability').value;
+          payload.admin = document.getElementById('userAdmin').value;
+          payload.timeZone = document.getElementById('userTimeZone').value;
+          payload.language = document.getElementById('userLanguage').value;
+          payload.wut = document.getElementById('userWut').value;
+        } else if(object == "contact") {
+          payload.name = document.getElementById('tagName').value;
+          payload.color = document.getElementById('tagColor').value;
+          payload.description = document.getElementById('tagDescription').value;
+        };
+        google.script.run.createRecord(payload);
+      }
+    }
+    function showForms(object) {
+      if(object != "user" && object != "tag" && object != "contact") alert("please select correct object!");
+      else {
+        if(object == "tag") {
+          document.getElementById("userForm").style.display = 'none';
+          document.getElementById("contactForm").style.display = 'none';
+          if(document.getElementById("tagForm").style.display = 'none') document.getElementById("tagForm").style.display = '';
+          else document.getElementById("tagForm").style.display = 'none';
+        } else if(object == "user") {
+          document.getElementById("tagForm").style.display = 'none';
+          document.getElementById("contactForm").style.display = 'none';
+          if(document.getElementById("userForm").style.display = 'none') document.getElementById("userForm").style.display = '';
+          else document.getElementById("userForm").style.display = 'none';
+        } else if(object == "contact") {
+          document.getElementById("userForm").style.display = 'none';
+          document.getElementById("tagForm").style.display = 'none';
+          if(document.getElementById("contactForm").style.display = 'none') document.getElementById("contactForm").style.display = '';
+          else document.getElementById("contactForm").style.display = 'none';
+        }
+      }
+    };
+  </script>
+</html>
