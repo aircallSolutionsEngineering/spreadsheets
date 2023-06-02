@@ -7,7 +7,7 @@ function triggerAircallCallData() {
 	// getAll("calls", dateFrom, dateTo, false);
 	/* get interval data */
 	let dateTimeNowInSeconds = Math.floor(Date.now() / 1000);
-	const dateTimeNowMinus1DayInSeconds = dateTimeNowInSeconds - (60 * 60 );
+	const dateTimeNowMinus1DayInSeconds = dateTimeNowInSeconds - (60 * 60);
 	// Logger.log('Now: '+dateTimeNowInSeconds+' minus 1 hour: '+dateTimeNowMinus1HourInSeconds);
 	const dateTimeNowFormat = new Date(dateTimeNowInSeconds);
 	const dateTimeNowDay = dateTimeNowFormat.getDay();

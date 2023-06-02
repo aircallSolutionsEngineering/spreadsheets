@@ -107,6 +107,28 @@ async function createDialerCampaign() {
     // Logger.log(error);
   };
 };
+// user dictionary for other agents
+const userDict = [
+  {
+    name: 'name 1',
+    email: 'email 1',
+    aircall_id: 'id 1',
+    number_id: 'number id 1'
+  },
+  {
+    name: 'name 2',
+    email: 'email 2',
+    aircall_id: 'id 2',
+    number_id: 'number id 2'
+  },
+  {
+    name: 'name 3',
+    email: 'email 3',
+    aircall_id: 'id 3',
+    number_id: 'number id 3'
+  }
+];
+
 // give dialer campaign to someone else
 async function delegateDialerCampaign(agent) {
   // Logger.log(selectedPhoneNumbers);
