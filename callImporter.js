@@ -102,7 +102,7 @@ async function getAll(object, dateFrom, dateTo, dataOverwrite) {
 				cols.forEach(function (col) {
 					printCols.push([col]);
 				});
-        // additional columns
+        // additional Google Sheet column headerss
 				printCols.push(["dateTime"]);
 				printCols.push(["date"]);
 				printCols.push(["week"]);
@@ -121,11 +121,13 @@ async function getAll(object, dateFrom, dateTo, dataOverwrite) {
 					finalRecords.push(printCols);
 				}
 			};
+      // determine column length for number of spreadsheet columns
+      let maxRecordColumns = (finalRecords[0] != null) ? finalRecords[0].length : 0;
       for (r = 0; r < objectRecords.length; r++) {
         let recordRow = [];
         const recordFields = Object.values(objectRecords[r]);
         for (let rf = 0; rf < 26; rf++) recordRow.push([recordFields[rf]]);
-        // formulas or specific data for the additional columns
+        // Additional Google Sheet formulas or specific data for the additional columns
         recordRow.push(["=EPOCHTODATE(F:F)"]);
 				recordRow.push(["=LEFT(AA:AA;10)"]);
 				recordRow.push(["=WEEKNUM(AB:AB)"]);
@@ -159,6 +161,7 @@ async function getAll(object, dateFrom, dateTo, dataOverwrite) {
         };
         recordRow.push([teamName]);
         finalRecords.push(recordRow);
+        if (recordRow.length > maxRecordColumns) maxRecordColumns = recordRow.length;
       }
       const numberOfRows =
 				SpreadsheetApp.getActive()
@@ -171,12 +174,7 @@ async function getAll(object, dateFrom, dateTo, dataOverwrite) {
       // Logger.log('writing from row: '+numberOfRows);
       SpreadsheetApp.getActive()
 				.getSheetByName(object + " data")
-				.getRange(
-					numberOfRows,
-					1,
-					finalRecords.length,
-					Object.keys(objectRecords[0]).length + 13
-				)
+				.getRange(numberOfRows, 1, finalRecords.length, maxRecordColumns)
 				.setValues(finalRecords);
       page += 1;
       nextUrl = data["meta"]["next_page_link"];

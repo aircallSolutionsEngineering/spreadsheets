@@ -114,22 +114,29 @@ Additional settings such as `role_ids`, `is_admin` and `availability_status` can
 Reporting on calls with Aircall can be done from within the Aircall Dashboard but if you want more flexibility on reports, you can download the Aircall Call data via the <a href="https://developer.aircall.io/api-references/#search-calls" target="_blank">Aircall Search Calls API</a>.
 The call data will follow the data structure of the Aircall call data and additional columns that are derived from the Aircall data can be added to the spreadsheet like:
 ```javascript
-// Google Sheet column header
+// additional Google Sheet column headerss
 printCols.push(["dateTime"]);
 printCols.push(["date"]);
-printCols.push(["talkingTime"]);
-printCols.push(["waitingTime"]);
-printCols.push(["line"]);
-printCols.push(["tags"]);
-printCols.push(["agent"]);
 printCols.push(["week"]);
 printCols.push(["month"]);
-// Google Sheet row data
+printCols.push(["talkingTime"]);
+printCols.push(["waitingTime"]);
+printCols.push(["number"]);
+printCols.push(["numberCountryCode"]);
+printCols.push(["tags"]);
+printCols.push(["agent"]);
+printCols.push(["agentEmail"]);
+printCols.push(["agentNumber"]);
+printCols.push(["team"]);
+// Additional Google Sheet formulas or specific data for the additional columns
 recordRow.push(["=EPOCHTODATE(F:F)"]);
 recordRow.push(["=LEFT(AA:AA;10)"]);
+recordRow.push(["=WEEKNUM(AB:AB)"]);
+recordRow.push(["=MONTH(AB:AB)"]);
 recordRow.push(['=IF(D:D<>"done";0;IF(G:G<>"";H:H-G:G;0))']);
 recordRow.push(['=IF(D:D<>"done";0;IF(G:G<>"";G:G-F:F;I:I))']);
 recordRow.push(objectRecords[r]["number"]["name"]);
+recordRow.push((objectRecords[r]["number"] != null && objectRecords[r]["number"]["country"] != null) ? objectRecords[r]["number"]["country"] : "");
 let tags = "";
 if (objectRecords[r]["tags"].length != 0) {
 	for (let t = 0; t < objectRecords[r]["tags"].length; t++) {
@@ -138,12 +145,22 @@ if (objectRecords[r]["tags"].length != 0) {
 	}
 }
 recordRow.push([tags]);
-let agent = "";
-if (objectRecords[r]["user"] != null)
-	agent = objectRecords[r]["user"]["name"];
-recordRow.push([agent]);
-recordRow.push(["=WEEKNUM(AB:AB)"]);
-recordRow.push(["=MONTH(AB:AB)"]);
+let agentName = "";
+let agentEmail = "";
+if (objectRecords[r]["user"] != null) {
+	// console.log(objectRecords[r]["user"]);
+	agentEmail = objectRecords[r]["user"]["email"];
+	agentName = objectRecords[r]["user"]["name"];
+};
+recordRow.push([agentName]);
+recordRow.push([agentEmail]);
+recordRow.push((objectRecords[r]["number"] != null && objectRecords[r]["number"]["digits"] != null) ? objectRecords[r]["number"]["digits"] : "");
+let teamName = "";
+if(objectRecords[r]["teams"].length > 0) {
+	// console.log(objectRecords[r]["teams"]);
+	teamName = objectRecords[r]["teams"][0]["name"];
+};
+recordRow.push([teamName]);
 ```
 When configuration about the column headers and the row data is complete, <a href="https://developers.google.com/apps-script/guides/triggers/installable" target="_blank" >Google Apps triggers</a> can be added to download the Aircall data. With a limit of 10000 calls per API request, it is important to GET the Aircall call data regurlarly. It is recommend to get the call data once a day, the script has an example to download the data each hour and clear the data each Monday at 00:00 hours again:
 ```javascript
