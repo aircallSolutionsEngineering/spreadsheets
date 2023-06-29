@@ -14,7 +14,17 @@ function triggerAircallCallData() {
 	const dateTimeNowHour = dateTimeNowFormat.getHours();
 	if(dateTimeNowDay == 1 && dateTimeNowHour == 0) getAll('calls',dateTimeNowMinus1DayInSeconds,dateTimeNowInSeconds,true);
 	else getAll('calls',dateTimeNowMinus1DayInSeconds,dateTimeNowInSeconds,false);
-}
+};
+
+// to get as much historic data into sheet at once
+async function monthAircallCallDataImporter() {
+  /* get specific date range */
+  const dateFrom = new Date("2023-01-20").getTime() / 1000;
+  const dateTo = new Date("2023-01-31").getTime() / 1000;
+  for(let d = dateFrom; d <= dateTo;d = d + (60 * 60 * 24)) {
+    await getAll('calls',d,d+(60 * 60 * 24),false);
+  };
+};
 
 // generic API GET request to all Aircall objects
 async function getAircallData(apiUrl, object) {
