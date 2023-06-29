@@ -3,7 +3,7 @@
 Welcome to the Google Apps Scripts in collaboration with <a href="https://developer.aircall.io/api-references/" target="_blank">Aircall</a>. To integrate Aircall functionalities with Google Sheets, we offer the following functions and pages.
 <br><br>
 
-## Introduction
+## Introduction</a>
 Aircall is a cloud based telephony provider with a Softphone that can be used by employees on any device and from any location. This means that employees:
 <br>👉 want to call but not necessarily have access to all the data to make the call 
 <br>👉 want to review the calls they made
@@ -12,7 +12,7 @@ Aircall is a cloud based telephony provider with a Softphone that can be used by
 For these use cases, please see all the available Google App Scripts and automate processes with Aircall from within a Google Sheet.
 <br>
 
-### Base Properties
+### <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/baseProperties.js" target="_blank">Base Properties</a>
 We recommend you to work with <a href="https://developers.google.com/apps-script/guides/properties" target="_blank">Google's script properties</a> to provide a bit of security in the scripts. For the Aircall connection, a set of <a href="https://support.aircall.io/hc/en-gb/articles/10375354348829-Integrations-and-API" target="_blank">API ID and Secret</a> needs to created in the Aircall Dashboard.
 ```javascript
 const scriptProperties = PropertiesService.getScriptProperties();
@@ -22,7 +22,7 @@ const apiToken = scriptProperties.getProperty("apiToken");
 Additionally, you can add active or particular sheets to the base properties to reference in the other functions.
 <br>
 
-### Support Functions
+### <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/supportFunctions.js" target="_blank">Support Functions</a>
 The support functions incorporate:
 <br>👉 generic functions for CRUD actions
 <br>👉 user functions to start CRUD actions with the <a href="https://developer.aircall.io/api-references/#user" target="_blank">Aircall Users API</a>
@@ -32,7 +32,7 @@ The support functions incorporate:
 <br>👉 example of a <a href="https://developers.google.com/apps-script/guides/menus" target="_blank">Google custom menu</a> and <a href="https://developers.google.com/apps-script/guides/dialogs" target="_blank">Google sidebar</a> functions
 <br>
 
-### HTML Sidebars
+### <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/softphone.html" target="_blank">HTML Sidebars</a>
 Google Sheets offers the ability for small <a href="https://developers.google.com/apps-script/guides/dialogs" target="_blank">HTML sidebars</a> that can interact with the spreadsheet. This can be used as HTML form to control import and export of data but also to embed the Aircall Softphone like:
 ```html
  <iframe
@@ -52,13 +52,13 @@ function showAircallSoftphone() {
 That function can be connected to a custom menu to allow the user to open the sidebar on click but it is also possible to add it to the `onOpen()` function to open up immediately.
 <br><br>
 
-## Click To Dial / Call
+## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/clickToCallDial.js" target="_blank">Click To Dial / Call</a>
 The functions for click to dial and click to call work with the following Aircall APIs:
 <br>👉 dial the phone number in the Softphone using the <a href="https://developer.aircall.io/api-references/#dial-a-phone-number-in-the-phone" target="_blank">Aircall Dial a Number API</a>
 <br>👉 call the phone number with the Softphone using the <a href="https://developer.aircall.io/api-references/#start-an-outbound-call" target="_blank">Aircall Start an outbound Call API</a>
 <br><br>
 
-## Dialer Campaigns
+## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/dialerCampaign.js" target="_blank">Dialer Campaigns</a>
 To load a list of phone numbers to call one after the other, a Dialer Campaign is availabe with the Aircall Softphone. The functions will take a selection of Google Sheet cells and add all numbers in that order into an Aircall Dialer Campaign.
 To start the copy over into a Dialer Campaign, an example of a custom menu is added:
 ```javascript
@@ -92,7 +92,7 @@ const userDict = [
 ```
 <br>
 
-## User Importer
+## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/userImporter.js" target="_blank">User Importer</a>
 When many users need to be created, this script will allow you to:
 <br>👉 make a CSV file
 <br>👉 edit anything in bulk
@@ -110,7 +110,7 @@ const payloadBody = {
 Additional settings such as `role_ids`, `is_admin` and `availability_status` can be added to the Google Sheet as columns to further customise the creation of each user.
 <br><br>
 
-## Call Importer
+## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/callImporter.js" target="_blank">Call Importer</a>
 Reporting on calls with Aircall can be done from within the Aircall Dashboard but if you want more flexibility on reports, you can download the Aircall Call data via the <a href="https://developer.aircall.io/api-references/#search-calls" target="_blank">Aircall Search Calls API</a>.
 The call data will follow the data structure of the Aircall call data and additional columns that are derived from the Aircall data can be added to the spreadsheet like:
 ```javascript
@@ -160,7 +160,7 @@ else getAll('calls',dateTimeNowMinus1DayInSeconds,dateTimeNowInSeconds,false);
 This function will set the `FROM` and `TO` in the Aircall Search Calls API to download call data from the last hour then combined with an hourly Google App Scripts trigger. This is the most frequent time trigger that can be set up and will make the Google Sheet maximum 1 hour delayed.
 <br><br>
 
-## Team Manager
+## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/teamManagement.js" target="_blank">Team Management</a>
 Aircall allows supervisors and admins to change the agents within the ringing teams. If each agent can easily change whether to be part of ringing groups without opening up all the permissions in Aircall, a Google Sheet with team management can be created.
 
 The Google Sheet will allow agents to edit whether they are part of a team with a simple cell change. The Google Sheet will execute this change in Aircall using:
