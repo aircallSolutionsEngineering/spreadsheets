@@ -172,6 +172,16 @@ async function getAll(object, dateFrom, dateTo, dataOverwrite) {
 							.getSheetByName(object + " data")
 							.getLastRow() + 1;
       // Logger.log('writing from row: '+numberOfRows);
+      /* send out notifications if getting to the 10 million cell per Workbook limit
+      if(numberOfRows > (9500000 / maxRecordColumns)) {
+        SpreadsheetApp.getActive().getSheetByName(object + " data").setTabColor("ff0000");
+        MailApp.sendEmail({
+          to: '',
+          subject: 'Google Sheet with Aircall data: call data is close to limit',
+          htlmBody: 'Hi,\nthe Google Sheet with the Aircall call data: https://docs.google.com/spreadsheets/d/ is reaching more than 9.5 million cells. Please start a new Worksheet.'
+        });
+      };
+      */
       SpreadsheetApp.getActive()
 				.getSheetByName(object + " data")
 				.getRange(numberOfRows, 1, finalRecords.length, maxRecordColumns)
