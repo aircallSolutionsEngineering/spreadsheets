@@ -129,7 +129,7 @@ async function getAll(object, dateFrom, dateTo, dataOverwrite) {
         for (let rf = 0; rf < 26; rf++) recordRow.push([recordFields[rf]]);
         // Additional Google Sheet formulas or specific data for the additional columns
         recordRow.push(["=EPOCHTODATE(F:F)"]);
-				recordRow.push(["=LEFT(AA:AA;10)"]);
+				recordRow.push(['=LEFT(AA:AA,(FIND(" ",AA:AA,1)-1))']);
 				recordRow.push(["=WEEKNUM(AB:AB)"]);
 				recordRow.push(["=MONTH(AB:AB)"]);
 				recordRow.push(['=IF(D:D<>"done";0;IF(G:G<>"";H:H-G:G;0))']);
