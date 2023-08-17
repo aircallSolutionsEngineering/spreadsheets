@@ -180,7 +180,7 @@ async function syncTeamManagement() {
             // Logger.log("bingo! comparing user id: "+JSON.stringify(teamUsers[tu])+" with users plan id: "+userId);
             SpreadsheetApp.getActive()
               .getSheetByName("team plan")
-              .getRange(up + 1, tp + 2)
+              .getRange(up + 2, tp + 2)
               .setValue("Logged In")
               .setBackground(aircallColor);
             break;
