@@ -1,5 +1,5 @@
 // base information
-// const ss = SpreadsheetApp.getActiveSheet();
+// const ss = SpreadsheetApp.getActive();
 // const ui = SpreadsheetApp.getUi();
 const baseUrl = "https://api.aircall.io/v1/";
 const scriptProperties = PropertiesService.getScriptProperties();
