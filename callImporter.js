@@ -115,8 +115,8 @@ async function getAll(object, dateFrom, dateTo, dataOverwrite) {
         recordRow.push(['=LEFT(AA:AA,(FIND(" ",AA:AA,1)-1))']);
         recordRow.push(["=WEEKNUM(AB:AB)"]);
         recordRow.push(["=MONTH(AB:AB)"]);
-        recordRow.push(['=IF(D:D<>"done";0;IF(G:G<>"";H:H-G:G;0))']);
-        recordRow.push(['=IF(D:D<>"done";0;IF(G:G<>"";G:G-F:F;I:I))']);
+        recordRow.push(['=IF(D:D<>"done",0,IF(G:G<>"",H:H-G:G,0))']);
+        recordRow.push(['=IF(D:D<>"done",0,IF(G:G<>"",G:G-F:F,I:I))']);
         recordRow.push(objectRecords[r]["number"]["name"]);
         recordRow.push(objectRecords[r]["number"] != null && objectRecords[r]["number"]["country"] != null ? objectRecords[r]["number"]["country"] : "");
         let tags = "";
