@@ -19,8 +19,7 @@ async function containsNumbers(str) {
   return /\d/.test(str);
 }
 async function isPhoneNumber(str) {
-  const validatePhoneRegex = /^\+[1-9]\d{10,14}$/;
-  Logger.log(str + " return: " + validatePhoneRegex.test(str));
+  const validatePhoneRegex = /^\+[1-9]\d{8,14}$/;
   return validatePhoneRegex.test(str);
 }
 async function validateEmail(input) {
@@ -60,7 +59,7 @@ async function checkContactsData() {
   contactsTab.getRange(2, 1, contactsTab.getLastRow(), 7).clearFormat();
   // check everything is fine with credentials
   await checkCompanyOverview();
-  const contactsHeaders = contactsTab.getRange(2, 1, 1, 6).getValues()[0];
+  const contactsHeaders = contactsTab.getRange(2, 1, 1, contactsTab.getLastColumn()).getValues()[0];
   const contactsData = contactsTab.getRange(3, 1, contactsTab.getLastRow() - 1, 6).getValues();
   // Logger.log(contactsHeaders);
   // Logger.log(contactsData);
@@ -123,7 +122,8 @@ async function checkContactsData() {
         } else contactsTab.getRange(u + 3, headersPositionCompany + 1).clearFormat();
       }
       ui.alert("There are " + invalidcontactsData + " invalid cells highlighted with a red background that need to be corrected before the upload");
-      return invalidcontactsData, contactsData;
+      // Logger.log(headersPosition);
+      return [invalidcontactsData, contactsData, headersPosition];
     }
   }
 }
@@ -133,29 +133,30 @@ async function uploadContactsData() {
   const contactsCheck = await checkContactsData();
   const invalidcontactsData = contactsCheck[0];
   const contactsData = contactsCheck[1];
+  const contactsSchema = contactsCheck[2];
   if (invalidcontactsData > 0) ui.alert("There are " + invalidcontactsData + " invalid cells highlighted with a red background that need to be corrected before the upload");
   else {
     contactsTab.getRange(2, 7).setValue("Result");
     // create users by API
     for (let u = 0; u < contactsData.length - 1; u++) {
       const contactRecord = {
-        firstName: contactsData[u][headersPositionFirstName],
-        lastName: contactsData[u][headersPositionLastName],
-        email: contactsData[u][headersPositionEmail],
-        phone1: contactsData[u][headersPositionPhone1],
-        phone2: contactsData[u][headersPositionPhone2],
-        company: contactsData[u][headersPositionCompany],
+        firstName: contactsData[u][contactsSchema.find((s) => s.column === "firstName").position],
+        lastName: contactsData[u][contactsSchema.find((s) => s.column === "lastName").position],
+        email: contactsData[u][contactsSchema.find((s) => s.column === "email").position],
+        phone1: contactsData[u][contactsSchema.find((s) => s.column === "phone1").position],
+        phone2: contactsData[u][contactsSchema.find((s) => s.column === "phone2").position],
+        company: contactsData[u][contactsSchema.find((s) => s.column === "company").position],
       };
       const createContact = await createRecord("contact", contactRecord);
-      if (createContact.getResponseCode != 201) {
+      if (createContact.getResponseCode() != 201) {
         contactsTab.getRange(u + 3, 7).setValue(createContact.getContentText());
         contactsTab.getRange(u + 3, 7).setBackground("red");
       } else {
         contactsTab.getRange(u + 3, 7).setValue("created");
         contactsTab.getRange(u + 3, 7).setBackground("green");
       }
-      Logger.log("created: " + createContact);
-      Utilities.sleep(500);
+      Logger.log("created " + (u + 1) + "/" + contactsData.length + ": " + createContact);
+      Utilities.sleep(800);
     }
   }
 }
@@ -167,13 +168,14 @@ async function createRecord(object, record) {
   if (object != "user" && object != "tag" && object != "contact") ui.alert("please provide correct object. " + object + " is not valid");
   else {
     let payloadBody = {
-      phone_numbers: [record["phone1"], record["phone2"]],
+      phone_numbers: [{ label: "Work", value: record["phone1"] }],
     };
-    if (record["email"] != null) payloadBody.email = record["email"];
-    if (record["firstName"] != null) payloadBody.first_name = record["firstName"];
-    if (record["lastName"] != null) payloadBody.last_name = record["lastName"];
-    if (record["company"] != null) payloadBody.company_name = record["company"];
-    // Logger.log(payloadBody);
+    if (record["phone2"] != "") payloadBody.phone_numbers.push(record[{ label: "Work", value: "phone2" }]);
+    if (record["email"] != "") payloadBody.email = [{ label: "Work", value: record["email"] }];
+    if (record["firstName"] != "") payloadBody.first_name = record["firstName"];
+    if (record["lastName"] != "") payloadBody.last_name = record["lastName"];
+    if (record["company"] != "") payloadBody.company_name = record["company"];
+    // Logger.log(JSON.stringify(payloadBody));
     const res = await UrlFetchApp.fetch(baseUrl + "contacts", {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       contentType: "application/json", // sending JSON data
