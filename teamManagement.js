@@ -7,47 +7,35 @@ function onOpen() {
   ui.createMenu("🚀 Aircall 🚀").addItem("Sync User List", "syncUsers").addItem("Sync Team List", "syncTeams").addSeparator().addItem("Create Team Management", "createTeamManagement").addItem("Sync Team Management", "syncTeamManagement").addToUi();
 }
 
-// get all users or teams or numbers or contacts
+/// get all users or teams or numbers or contacts
 async function listRecords(object) {
   if (object != "users" && object != "teams" && object != "numbers" && object != "contacts") ui.alert("incorrect object: " + object + " is not part of Aircall APIs");
   else {
     let records = [];
     try {
-      let req = await UrlFetchApp.fetch(baseUrl + object + "?per_page=50", {
-        method: "GET", // *GET, POST, PUT, DELETE, etc.
-        headers: {
-          Authorization: "Basic " + Utilities.base64Encode(PropertiesService.getScriptProperties().getProperty("apiId") + ":" + PropertiesService.getScriptProperties().getProperty("apiToken")), // authorization header
-          "Content-Type": "application/json", // sending JSON data
-        },
-        muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
-        //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
-      });
-      // Logger.log('existing dialer campaign: '+res.getResponseCode());
-      if (req.getResponseCode() !== 200) ui.alert("👎👎👎Error👎👎👎\r\nCant grab all the " + object + "\r\n\r\n" + req.getContentText());
-      else {
-        // ui.alert('👍👍👍Success👍👍👍\r\nAll '+objects);
-        let res = JSON.parse(req.getContentText());
-        records = res[object];
-        // Logger.log(res.meta);
-        if (res.meta["next_page_link"] != null) {
-          for (let p = 2; p < Math.ceil(res.meta["total"] / 50); p++) {
-            req = await UrlFetchApp.fetch(baseUrl + object + "?per_page=50&page=" + p, {
-              method: "GET", // *GET, POST, PUT, DELETE, etc.
-              headers: {
-                Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
-                "Content-Type": "application/json", // sending JSON data
-              },
-              muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
-              //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
-            });
-            res = JSON.parse(req.getContentText());
-            records = records.concat(res[object]);
-          }
+      let threshold = 1;
+      for (let p = 1; p <= threshold; p++) {
+        req = await UrlFetchApp.fetch(baseUrl + object + "?per_page=50&page=" + p, {
+          method: "GET", // *GET, POST, PUT, DELETE, etc.
+          headers: {
+            Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
+            "Content-Type": "application/json", // sending JSON data
+          },
+          muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
+          //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
+        });
+        if (req.getResponseCode() !== 200) ui.alert("👎👎👎Error👎👎👎\r\nCant grab all the " + object + "\r\n\r\n" + req.getContentText());
+        else {
+          // ui.alert('👍👍👍Success👍👍👍\r\nAll '+objects);
+          res = JSON.parse(req.getContentText());
+          threshold = Math.ceil(res.meta["total"] / 50);
+          records = records.concat(res[object]);
+          // Logger.log(records.length);
         }
       }
       return records;
     } catch (error) {
-      ui.alert("👎👎👎Error👎👎👎\r\nCant create the " + object + "\r\n\r\n" + error);
+      ui.alert("👎👎👎Error👎👎👎\r\nCant list the " + object + "\r\n\r\n" + error);
       // deal with any errors
       // Logger.log(error);
     }

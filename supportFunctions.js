@@ -3,38 +3,20 @@ async function getAll(object) {
   const lastRow = ss.getLastRow();
   if (lastRow != 0) ss.getRange(8, 1, lastRow, 25).clear();
   try {
-    const from =
-      ss.getRange("L5").isBlank() == false
-        ? "&from=" + ss.getRange("L2").getValue().getTime() / 1000
-        : "";
-    const to =
-      ss.getRange("L6").isBlank() == false
-        ? "&to=" + ss.getRange("L3").getValue().getTime() / 1000
-        : "";
+    const from = ss.getRange("L5").isBlank() == false ? "&from=" + ss.getRange("L2").getValue().getTime() / 1000 : "";
+    const to = ss.getRange("L6").isBlank() == false ? "&to=" + ss.getRange("L3").getValue().getTime() / 1000 : "";
     // Default options are marked with *
-    const res = await UrlFetchApp.fetch(
-      baseUrl + object + "?per_page=50&order=desc" + from + to,
-      {
-        method: "GET", // *GET, POST, PUT, DELETE, etc.
-        headers: {
-          Authorization:
-            "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
-          "Content-Type": "application/json", // sending JSON data
-          muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
-        },
-        //payload: JSON.stringify(data) // body data type must match "Content-Type" header
-      }
-    );
+    const res = await UrlFetchApp.fetch(baseUrl + object + "?per_page=50&order=desc" + from + to, {
+      method: "GET", // *GET, POST, PUT, DELETE, etc.
+      headers: {
+        Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
+        "Content-Type": "application/json", // sending JSON data
+        muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
+      },
+      //payload: JSON.stringify(data) // body data type must match "Content-Type" header
+    });
     const data = JSON.parse(res);
-    if (data[object] == null)
-      ui.alert(
-        "Trouble with connecting to the Aircall " +
-          object +
-          " API, status code: " +
-          res.status +
-          " and body: " +
-          res.data
-      );
+    if (data[object] == null) ui.alert("Trouble with connecting to the Aircall " + object + " API, status code: " + res.status + " and body: " + res.data);
     else {
       const objectRecords = data[object];
       if (objectRecords.length === 0) ui.alert("No " + object + " available");
@@ -72,55 +54,61 @@ const createDict = [
   },
   {
     name: "user",
-    fields: [
-      "email",
-      "first_name",
-      "last_name",
-      "availability",
-      "admin",
-      "time_zone",
-      "language",
-      "wrap_up_time",
-    ],
+    fields: ["email", "first_name", "last_name", "availability", "admin", "time_zone", "language", "wrap_up_time"],
   },
   {
     name: "contact",
-    fields: [
-      "first_name",
-      "last_name",
-      "company_name",
-      "information",
-      "emails.label",
-      "emails.value",
-      "phone_numbers.label",
-      "phone_numbers.value",
-    ],
+    fields: ["first_name", "last_name", "company_name", "information", "emails.label", "emails.value", "phone_numbers.label", "phone_numbers.value"],
   },
 ];
 
+// get all users or teams or numbers or contacts
+async function listRecords(object) {
+  if (object != "users" && object != "teams" && object != "numbers" && object != "contacts") ui.alert("incorrect object: " + object + " is not part of Aircall APIs");
+  else {
+    let records = [];
+    try {
+      let threshold = 1;
+      for (let p = 1; p <= threshold; p++) {
+        req = await UrlFetchApp.fetch(baseUrl + object + "?per_page=50&page=" + p, {
+          method: "GET", // *GET, POST, PUT, DELETE, etc.
+          headers: {
+            Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
+            "Content-Type": "application/json", // sending JSON data
+          },
+          muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
+          //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
+        });
+        if (req.getResponseCode() !== 200) ui.alert("👎👎👎Error👎👎👎\r\nCant grab all the " + object + "\r\n\r\n" + req.getContentText());
+        else {
+          // ui.alert('👍👍👍Success👍👍👍\r\nAll '+objects);
+          res = JSON.parse(req.getContentText());
+          threshold = Math.ceil(res.meta["total"] / 50);
+          records = records.concat(res[object]);
+          // Logger.log(records.length);
+        }
+      }
+      return records;
+    } catch (error) {
+      ui.alert("👎👎👎Error👎👎👎\r\nCant list the " + object + "\r\n\r\n" + error);
+      // deal with any errors
+      // Logger.log(error);
+    }
+  }
+}
+
 async function createRecord(object) {
-  if (object != "user" && object != "tag" && object != "contact")
-    ui.alert("please provide correct object. " + object + " is not valid");
+  if (object != "user" && object != "tag" && object != "contact") ui.alert("please provide correct object. " + object + " is not valid");
   else {
     const objectFields = createDict.find((i) => i.name === object).fields;
-    if (ss.getRange(5, 1, 1, objectFields.length).isBlank() == true)
-      ss.getRange(5, 1, 1, objectFields.length).setValues([objectFields]);
+    if (ss.getRange(5, 1, 1, objectFields.length).isBlank() == true) ss.getRange(5, 1, 1, objectFields.length).setValues([objectFields]);
     else {
-      const objectValues = ss
-        .getRange(6, 1, 1, objectFields.length)
-        .getValues();
-      if (ss.getRange(6, 1, 1, objectFields.length).isBlank() === true)
-        ui.prompt("Please provide data to create the " + object);
+      const objectValues = ss.getRange(6, 1, 1, objectFields.length).getValues();
+      if (ss.getRange(6, 1, 1, objectFields.length).isBlank() === true) ui.prompt("Please provide data to create the " + object);
       else {
         const payloadBody = {};
         for (x = 0; x < objectFields.length; x++) {
-          if (objectValues[0][x] == "")
-            ui.prompt(
-              "Please provide data for the " +
-                object +
-                " in the field " +
-                objectFields[x]
-            );
+          if (objectValues[0][x] == "") ui.prompt("Please provide data for the " + object + " in the field " + objectFields[x]);
           else {
             const payloadName = objectFields[x];
             payloadBody[payloadName] = objectValues[0][x];
@@ -133,14 +121,11 @@ async function createRecord(object) {
 }
 
 async function updateRecord(object) {
-  if (object != "user" && object != "tag" && object != "contact")
-    ui.alert("please provide correct object. " + object + " is not valid");
+  if (object != "user" && object != "tag" && object != "contact") ui.alert("please provide correct object. " + object + " is not valid");
   else {
     const objectRow = ss.getCurrentCell().getRow();
     ss.getRange(objectRow, 1, 1, 1).clearFormat();
-    const objectValues = ss
-      .getRange(objectRow, 1, 1, ss.getLastColumn())
-      .getValues();
+    const objectValues = ss.getRange(objectRow, 1, 1, ss.getLastColumn()).getValues();
     const objectHeaders = ss.getRange(8, 1, 1, ss.getLastColumn()).getValues();
     const payloadBody = {};
     for (x = 0; x < objectHeaders[0].length; x++) {
@@ -150,13 +135,9 @@ async function updateRecord(object) {
       const payloadName = objectHeaders[0][x];
       if ((object == "user") & (payloadName == "name")) {
         Logger.log(objectValues[0][x].split(" ")[0]);
-        Logger.log(
-          objectValues[0][x].substring(objectValues[0][x].indexOf(" ") + 1)
-        );
+        Logger.log(objectValues[0][x].substring(objectValues[0][x].indexOf(" ") + 1));
         payloadBody["first_name"] = objectValues[0][x].split(" ")[0];
-        payloadBody["last_name"] = objectValues[0][x].substring(
-          objectValues[0][x].indexOf(" ") + 1
-        );
+        payloadBody["last_name"] = objectValues[0][x].substring(objectValues[0][x].indexOf(" ") + 1);
       } else {
         payloadBody[payloadName] = objectValues[0][x];
       }
@@ -167,15 +148,13 @@ async function updateRecord(object) {
 
 async function deleteRecord(object) {
   ss.getRange("L4").clear();
-  if (object != "user" && object != "tag" && object != "contact")
-    ui.alert("please provide correct object. " + object + " is not valid");
+  if (object != "user" && object != "tag" && object != "contact") ui.alert("please provide correct object. " + object + " is not valid");
   else {
     const recordId = ss.getCurrentCell().getValue();
     const res = await UrlFetchApp.fetch(baseUrl + object + "s/" + recordId, {
       method: "DELETE", // *GET, POST, PUT, DELETE, etc.
       headers: {
-        Authorization:
-          "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
+        Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
         "Content-Type": "application/json", // sending JSON data
         muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
       },
@@ -197,19 +176,14 @@ async function getUsers() {
     let req = await UrlFetchApp.fetch(baseUrl + "users?per_page=50", {
       method: "GET", // *GET, POST, PUT, DELETE, etc.
       headers: {
-        Authorization:
-          "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
+        Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
         "Content-Type": "application/json", // sending JSON data
       },
       muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
       //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
     });
     // Logger.log('existing dialer campaign: '+res.getResponseCode());
-    if (req.getResponseCode() !== 200)
-      ui.alert(
-        "👎👎👎Error👎👎👎\r\nCant grab all the Users\r\n\r\n" +
-          req.getContentText()
-      );
+    if (req.getResponseCode() !== 200) ui.alert("👎👎👎Error👎👎👎\r\nCant grab all the Users\r\n\r\n" + req.getContentText());
     else {
       // ui.alert('👍👍👍Success👍👍👍\r\nAll Users');
       let res = JSON.parse(req.getContentText());
@@ -217,19 +191,15 @@ async function getUsers() {
       // Logger.log(res.meta);
       if (res.meta.next_page_link != null) {
         for (p = 2; p < Math.ceil(res.meta.total / res.meta.count); p++) {
-          req = await UrlFetchApp.fetch(
-            baseUrl + "users?per_page=50&page=" + p,
-            {
-              method: "GET", // *GET, POST, PUT, DELETE, etc.
-              headers: {
-                Authorization:
-                  "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
-                "Content-Type": "application/json", // sending JSON data
-              },
-              muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
-              //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
-            }
-          );
+          req = await UrlFetchApp.fetch(baseUrl + "users?per_page=50&page=" + p, {
+            method: "GET", // *GET, POST, PUT, DELETE, etc.
+            headers: {
+              Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
+              "Content-Type": "application/json", // sending JSON data
+            },
+            muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
+            //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
+          });
           users = users.concat(JSON.parse(req.getContentText()).users);
         }
       }
@@ -251,15 +221,12 @@ async function createUser() {
 }
 
 async function deleteUser() {
-  if (ss.getCurrentCell().getColumn() != 1 || ss.getCurrentCell().getRow() < 9)
-    ui.prompt("Please select an ID from column A");
+  if (ss.getCurrentCell().getColumn() != 1 || ss.getCurrentCell().getRow() < 9) ui.prompt("Please select an ID from column A");
   else deleteRecord("user");
 }
 
 async function updateUser() {
-  const objectId = Math.floor(
-    ss.getRange(ss.getCurrentCell().getRow(), 1, 1, 1).getValue()
-  );
+  const objectId = Math.floor(ss.getRange(ss.getCurrentCell().getRow(), 1, 1, 1).getValue());
   const payloadBody = await updateRecord("user");
   const res = await UrlFetchApp.fetch(baseUrl + "users/" + String(objectId), {
     method: "PUT", // *GET, POST, PUT, DELETE, etc.
@@ -270,8 +237,7 @@ async function updateUser() {
     },
     payload: JSON.stringify(payloadBody), // body data type must match "Content-Type" header
   });
-  if (res.getResponseCode() != 200)
-    ui.prompt("Error in updating user: " + objectId);
+  if (res.getResponseCode() != 200) ui.prompt("Error in updating user: " + objectId);
   else {
     ss.getRange(ss.getCurrentCell().getRow(), 1, 1, 1).setBackground("green");
   }
@@ -284,8 +250,7 @@ async function getAllCalls() {
 
 async function tagCall() {
   let callId = ss.getCurrentCell();
-  if (callId.getColumn() != 1 || callId.getRow() < 9)
-    ui.prompt("no call ID selected");
+  if (callId.getColumn() != 1 || callId.getRow() < 9) ui.prompt("no call ID selected");
   else {
     try {
       callId = callId.getValue();
@@ -294,25 +259,18 @@ async function tagCall() {
       const button = result.getSelectedButton();
       if (button === ui.Button.OK) {
         const data = { tags: [String(result.getResponseText())] };
-        const res = await UrlFetchApp.fetch(
-          baseUrl + "calls/" + String(callId) + "/tags",
-          {
-            method: "POST", // *GET, POST, PUT, DELETE, etc.
-            headers: {
-              Authorization:
-                "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
-              "Content-Type": "application/json", // sending JSON data
-              muteHttpExceptions: false, // prevent Google alerts with 400 / 500 status codes
-            },
-            payload: JSON.stringify(data), // body data type must match "Content-Type" header
-          }
-        );
+        const res = await UrlFetchApp.fetch(baseUrl + "calls/" + String(callId) + "/tags", {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          headers: {
+            Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
+            "Content-Type": "application/json", // sending JSON data
+            muteHttpExceptions: false, // prevent Google alerts with 400 / 500 status codes
+          },
+          payload: JSON.stringify(data), // body data type must match "Content-Type" header
+        });
         Logger.log(res.getResponseCode());
         if (res.getResponseCode() != 201) ui.alert("Tag could not be added");
-        else
-          ui.alert(
-            "Tag; " + result.getResponseText() + " was added to call: " + callId
-          );
+        else ui.alert("Tag; " + result.getResponseText() + " was added to call: " + callId);
         Logger.log(ret);
       }
     } catch (error) {
@@ -324,8 +282,7 @@ async function tagCall() {
 
 async function commentCall() {
   let callId = ss.getCurrentCell();
-  if (callId.getColumn() != 1 || callId.getRow() < 9)
-    ui.prompt("no call ID selected");
+  if (callId.getColumn() != 1 || callId.getRow() < 9) ui.prompt("no call ID selected");
   else {
     try {
       callId = callId.getValue();
@@ -334,28 +291,18 @@ async function commentCall() {
       const button = result.getSelectedButton();
       if (button === ui.Button.OK) {
         const data = { content: String(result.getResponseText()) };
-        const res = await UrlFetchApp.fetch(
-          baseUrl + "calls/" + String(callId) + "/comments",
-          {
-            method: "POST", // *GET, POST, PUT, DELETE, etc.
-            headers: {
-              Authorization:
-                "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
-              "Content-Type": "application/json", // sending JSON data
-              muteHttpExceptions: false, // prevent Google alerts with 400 / 500 status codes
-            },
-            payload: JSON.stringify(data), // body data type must match "Content-Type" header
-          }
-        );
+        const res = await UrlFetchApp.fetch(baseUrl + "calls/" + String(callId) + "/comments", {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          headers: {
+            Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
+            "Content-Type": "application/json", // sending JSON data
+            muteHttpExceptions: false, // prevent Google alerts with 400 / 500 status codes
+          },
+          payload: JSON.stringify(data), // body data type must match "Content-Type" header
+        });
         Logger.log(res.getResponseCode());
         if (res.getResponseCode() != 201) ui.alert("Tag could not be added");
-        else
-          ui.alert(
-            "Comment; " +
-              result.getResponseText() +
-              " was added to call: " +
-              callId
-          );
+        else ui.alert("Comment; " + result.getResponseText() + " was added to call: " + callId);
         Logger.log(ret);
       }
     } catch (error) {
@@ -398,9 +345,7 @@ async function createTag() {
 }
 
 async function updateTag() {
-  const objectId = Math.floor(
-    ss.getRange(ss.getCurrentCell().getRow(), 1, 1, 1).getValue()
-  );
+  const objectId = Math.floor(ss.getRange(ss.getCurrentCell().getRow(), 1, 1, 1).getValue());
   const payloadBody = await updateRecord("tag");
   Logger.log(payloadBody);
   const res = await UrlFetchApp.fetch(baseUrl + "tags/" + String(objectId), {
@@ -412,16 +357,14 @@ async function updateTag() {
     },
     payload: JSON.stringify(payloadBody), // body data type must match "Content-Type" header
   });
-  if (res.getResponseCode() != 200)
-    ui.prompt("Error in updating tag: " + objectId);
+  if (res.getResponseCode() != 200) ui.prompt("Error in updating tag: " + objectId);
   else {
     ss.getRange(ss.getCurrentCell().getRow(), 1, 1, 1).setBackground("green");
   }
 }
 
 async function deleteTag() {
-  if (ss.getCurrentCell().getColumn() != 1 || ss.getCurrentCell().getRow() < 9)
-    ui.prompt("Please select an ID from column A");
+  if (ss.getCurrentCell().getColumn() != 1 || ss.getCurrentCell().getRow() < 9) ui.prompt("Please select an ID from column A");
   else deleteRecord("tag");
 }
 
@@ -435,31 +378,23 @@ function createContact() {
 }
 
 async function deleteContact() {
-  if (ss.getCurrentCell().getColumn() != 1 || ss.getCurrentCell().getRow() < 9)
-    ui.prompt("Please select an ID from column A");
+  if (ss.getCurrentCell().getColumn() != 1 || ss.getCurrentCell().getRow() < 9) ui.prompt("Please select an ID from column A");
   else deleteRecord("contact");
 }
 
 async function updateContact() {
-  const objectId = Math.floor(
-    ss.getRange(ss.getCurrentCell().getRow(), 1, 1, 1).getValue()
-  );
+  const objectId = Math.floor(ss.getRange(ss.getCurrentCell().getRow(), 1, 1, 1).getValue());
   const payloadBody = await updateRecord("contact");
-  const res = await UrlFetchApp.fetch(
-    baseUrl + "contacts/" + String(objectId),
-    {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
-      contentType: "application/json", // sending JSON data
-      muteHttpExceptions: false, // prevent Google alerts with 400 / 500 status codes
-      headers: {
-        Authorization:
-          "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
-      },
-      payload: JSON.stringify(payloadBody), // body data type must match "Content-Type" header
-    }
-  );
-  if (res.getResponseCode() != 200)
-    ui.prompt("Error in updating contact: " + objectId);
+  const res = await UrlFetchApp.fetch(baseUrl + "contacts/" + String(objectId), {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    contentType: "application/json", // sending JSON data
+    muteHttpExceptions: false, // prevent Google alerts with 400 / 500 status codes
+    headers: {
+      Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
+    },
+    payload: JSON.stringify(payloadBody), // body data type must match "Content-Type" header
+  });
+  if (res.getResponseCode() != 200) ui.prompt("Error in updating contact: " + objectId);
   else {
     ss.getRange(ss.getCurrentCell().getRow(), 1, 1, 1).setBackground("green");
   }
@@ -471,7 +406,6 @@ function onOpen() {
 }
 
 function showSidebar() {
-  var html =
-    HtmlService.createHtmlOutputFromFile("Sidebar").setTitle("Select Object");
+  var html = HtmlService.createHtmlOutputFromFile("Sidebar").setTitle("Select Object");
   ui.showSidebar(html);
 }
