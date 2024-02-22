@@ -1,21 +1,35 @@
+// base information
+// const ss = SpreadsheetApp.getActive();
+// const ui = SpreadsheetApp.getUi();
+const baseUrl = "https://api.aircall.io/v1/";
+const scriptProperties = PropertiesService.getScriptProperties();
+const apiId = scriptProperties.getProperty("apiId");
+const apiToken = scriptProperties.getProperty("apiToken");
+// check if API Token are working correctly
+//Logger.log('apiId: '+apiId+' Token: '+apiToken+'\n'+Utilities.base64Encode(apiId+':'+apiToken));
+// let activeUserEmail = Session.getActiveUser();
+
 // scheduler to work with the Apps trigger
 function triggerAircallCallData() {
   /* get interval data */
-  let dateTimeNowInSeconds = Math.floor(Date.now() / 1000);
-  const dateTimeNowMinus1DayInSeconds = dateTimeNowInSeconds - 60 * 60;
-  // Logger.log('Now: '+dateTimeNowInSeconds+' minus 1 hour: '+dateTimeNowMinus1HourInSeconds);
+  const dateTimeNowInSeconds = Math.floor(Date.now());
   const dateTimeNowFormat = new Date(dateTimeNowInSeconds);
   const dateTimeNowDay = dateTimeNowFormat.getDay();
   const dateTimeNowHour = dateTimeNowFormat.getHours();
-  if (dateTimeNowDay == 1 && dateTimeNowHour == 0) getAll("calls", dateTimeNowMinus1DayInSeconds, dateTimeNowInSeconds, true);
-  else getAll("calls", dateTimeNowMinus1DayInSeconds, dateTimeNowInSeconds, false);
+  const dateTimeNowMinute = dateTimeNowFormat.getMinutes();
+  // Logger.log(dateTimeNowInSeconds);
+  const dateTimeAPIQueryTo = Math.floor(dateTimeNowInSeconds / 1000);
+  const dateTimeAPIQueryFrom = dateTimeAPIQueryTo - 5 * 60;
+  // Logger.log("day of the week: "+dateTimeNowDay+" and the hour: "+ dateTimeNowHour);
+  if (dateTimeNowDay == 1 && dateTimeNowHour == 0 && dateTimeNowMinute < 6) getAll("calls", dateTimeAPIQueryFrom, dateTimeAPIQueryTo, true);
+  else getAll("calls", dateTimeAPIQueryFrom, dateTimeAPIQueryTo, false);
 }
 
 // to get as much historic data into sheet at once
 async function historicAircallCallDataImporter() {
   /* get specific date range */
-  const dateFrom = new Date("2023-01-20").getTime() / 1000;
-  const dateTo = new Date("2023-01-31").getTime() / 1000;
+  const dateFrom = new Date("2024-02-19").getTime() / 1000;
+  const dateTo = new Date("2024-02-21").getTime() / 1000;
   for (let d = dateFrom; d <= dateTo; d = d + 60 * 60 * 24) {
     await getAll("calls", d, d + 60 * 60 * 24, false);
   }
