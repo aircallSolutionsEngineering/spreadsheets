@@ -113,6 +113,7 @@ async function getAll(object, dateFrom, dateTo, dataOverwrite) {
         printCols.push(["agentEmail"]);
         printCols.push(["agentNumber"]);
         printCols.push(["team"]);
+        printCols.push(["localTime"]);
         // set column headers
         if (cols.length > 0) {
           finalRecords.push(printCols);
@@ -157,6 +158,8 @@ async function getAll(object, dateFrom, dateTo, dataOverwrite) {
           teamName = objectRecords[r]["teams"][0]["name"];
         }
         recordRow.push([teamName]);
+        const localTime = Utilities.formatDate(new Date(objectRecords[r]["started_at"] * 1000), "America/Chicago", "yyyy/MM/dd G 'at' HH:mm:ss z");
+        recordRow.push(localTime);
         finalRecords.push(recordRow);
         if (recordRow.length > maxRecordColumns) maxRecordColumns = recordRow.length;
       }
