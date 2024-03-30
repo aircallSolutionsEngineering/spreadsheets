@@ -1,5 +1,15 @@
+// base information
+const ss = SpreadsheetApp.getActiveSheet();
+const ui = SpreadsheetApp.getUi();
+const baseUrl = "https://api.aircall.io/v1/";
+const scriptProperties = PropertiesService.getScriptProperties();
+const apiId = scriptProperties.getProperty("apiId");
+const apiToken = scriptProperties.getProperty("apiToken");
+// check if API Token are working correctly
+//Logger.log('apiId: '+apiId+' Token: '+apiToken+'\n'+Utilities.base64Encode(apiId+':'+apiToken));
+let activeUserEmail = Session.getActiveUser();
+
 // additional base properties
-const reParenthesis = /\(([^)]+)\)/g;
 const aircallColor = "#00BD82";
 
 // add Aircall Menu
@@ -7,35 +17,47 @@ function onOpen() {
   ui.createMenu("🚀 Aircall 🚀").addItem("Sync User List", "syncUsers").addItem("Sync Team List", "syncTeams").addSeparator().addItem("Create Team Management", "createTeamManagement").addItem("Sync Team Management", "syncTeamManagement").addToUi();
 }
 
-/// get all users or teams or numbers or contacts
+// get all users or teams or numbers or contacts
 async function listRecords(object) {
   if (object != "users" && object != "teams" && object != "numbers" && object != "contacts") ui.alert("incorrect object: " + object + " is not part of Aircall APIs");
   else {
     let records = [];
     try {
-      let threshold = 1;
-      for (let p = 1; p <= threshold; p++) {
-        req = await UrlFetchApp.fetch(baseUrl + object + "?per_page=50&page=" + p, {
-          method: "GET", // *GET, POST, PUT, DELETE, etc.
-          headers: {
-            Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
-            "Content-Type": "application/json", // sending JSON data
-          },
-          muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
-          //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
-        });
-        if (req.getResponseCode() !== 200) ui.alert("👎👎👎Error👎👎👎\r\nCant grab all the " + object + "\r\n\r\n" + req.getContentText());
-        else {
-          // ui.alert('👍👍👍Success👍👍👍\r\nAll '+objects);
-          res = JSON.parse(req.getContentText());
-          threshold = Math.ceil(res.meta["total"] / 50);
-          records = records.concat(res[object]);
-          // Logger.log(records.length);
+      let req = await UrlFetchApp.fetch(baseUrl + object + "?per_page=50", {
+        method: "GET", // *GET, POST, PUT, DELETE, etc.
+        headers: {
+          Authorization: "Basic " + Utilities.base64Encode(PropertiesService.getScriptProperties().getProperty("apiId") + ":" + PropertiesService.getScriptProperties().getProperty("apiToken")), // authorization header
+          "Content-Type": "application/json", // sending JSON data
+        },
+        muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
+        //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
+      });
+      // Logger.log('existing dialer campaign: '+res.getResponseCode());
+      if (req.getResponseCode() !== 200) ui.alert("👎👎👎Error👎👎👎\r\nCant grab all the " + object + "\r\n\r\n" + req.getContentText());
+      else {
+        // ui.alert('👍👍👍Success👍👍👍\r\nAll '+objects);
+        let res = JSON.parse(req.getContentText());
+        records = res[object];
+        // Logger.log(res.meta);
+        if (res.meta["next_page_link"] != null) {
+          for (let p = 2; p < Math.ceil(res.meta["total"] / 50); p++) {
+            req = await UrlFetchApp.fetch(baseUrl + object + "?per_page=50&page=" + p, {
+              method: "GET", // *GET, POST, PUT, DELETE, etc.
+              headers: {
+                Authorization: "Basic " + Utilities.base64Encode(apiId + ":" + apiToken), // authorization header
+                "Content-Type": "application/json", // sending JSON data
+              },
+              muteHttpExceptions: true, // prevent Google alerts with 400 / 500 status codes
+              //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
+            });
+            res = JSON.parse(req.getContentText());
+            records = records.concat(res[object]);
+          }
         }
       }
       return records;
     } catch (error) {
-      ui.alert("👎👎👎Error👎👎👎\r\nCant list the " + object + "\r\n\r\n" + error);
+      ui.alert("👎👎👎Error👎👎👎\r\nCant create the " + object + "\r\n\r\n" + error);
       // deal with any errors
       // Logger.log(error);
     }
@@ -119,7 +141,7 @@ async function createTeamManagement() {
   teamPlanTab.getRange(1, 2, 1, teams.length).setValues([teamData]);
   // create complete sheet with log in / log out
   const logInLogOutRule = SpreadsheetApp.newDataValidation().requireValueInList(["Logged In", "Logged Out"], true).build();
-  teamPlanTab.getRange(2, 2, users.length, teams.length).setDataValidation(logInLogOutRule);
+  teamPlanTab.getRange(2, 2, users.length, teams.length - 1).setDataValidation(logInLogOutRule);
 }
 
 // sync current team structure into sheet
@@ -129,12 +151,6 @@ async function syncTeamManagement() {
   if (teamPlanTab != null) {
     teamPlanTab.getRange(2, 2, teamPlanTab.getLastRow(), teamPlanTab.getLastColumn()).clear();
   }
-  const users = SpreadsheetApp.getActive()
-    .getSheetByName("users")
-    .getSheetValues(2, 1, SpreadsheetApp.getActive().getSheetByName("users").getLastRow() - 1, 3);
-  const teams = SpreadsheetApp.getActive()
-    .getSheetByName("teams")
-    .getSheetValues(2, 1, SpreadsheetApp.getActive().getSheetByName("teams").getLastRow() - 1, 5);
   const teamsPlan = SpreadsheetApp.getActive()
     .getSheetByName("team plan")
     .getSheetValues(1, 2, 1, SpreadsheetApp.getActive().getSheetByName("team plan").getLastColumn() - 1);
@@ -144,26 +160,33 @@ async function syncTeamManagement() {
   // loop through each team by ID to get the users
   for (let tp = 0; tp < teamsPlan[0].length; tp++) {
     // Logger.log("going through team: "+teamsPlan[0][tp]);
-    const parenthesisTeamData = [...teamsPlan[0][tp].matchAll(reParenthesis)].flat();
-    const teamId = parenthesisTeamData.slice(-1)[0];
+    const teamId = teamsPlan[0][tp].substring(teamsPlan[0][tp].lastIndexOf("(") + 1, teamsPlan[0][tp].lastIndexOf(")"));
     // get team users
     let teamUsers = [];
-    if (teamId == teams[tp][0]) teamUsers = JSON.parse(teams[tp][4]);
-    else {
-      for (let t = 0; t < teams.length; t++) {
-        if (teamId == teams[t][0]) {
-          teamUsers = JSON.parse(teams[tp][4]);
-          break;
-        }
+    try {
+      const req = await UrlFetchApp.fetch(baseUrl + "teams/" + teamId, {
+        method: "GET", // *GET, POST, PUT, DELETE, etc.
+        headers: {
+          Authorization: "Basic " + Utilities.base64Encode(PropertiesService.getScriptProperties().getProperty("apiId") + ":" + PropertiesService.getScriptProperties().getProperty("apiToken")), // authorization header
+          "Content-Type": "application/json", // sending JSON data
+        },
+        //payload: JSON.stringify(data) // body data type must match 'Content-Type' header
+      });
+      const res = await JSON.parse(req.getContentText());
+      // console.log(req.status+" data: "+res);
+      if (req.getResponseCode() !== 200) console.log("👎👎👎Error👎👎👎\r\nCant grab all the team users\r\n\r\n" + req.body);
+      else {
+        teamUsers = res["team"]["users"];
       }
+    } catch (error) {
+      console.log("👎👎👎Error👎👎👎\r\nCant list the team\r\n\r\n" + error);
     }
     // Logger.log(teamUsers);
     if (teamUsers.length > 0) {
       for (let tu = 0; tu < teamUsers.length; tu++) {
         // Logger.log(teamUsers[tu]);
         for (let up = 0; up < usersPlan.length; up++) {
-          const parenthesisUserData = [...usersPlan[up][0].matchAll(reParenthesis)].flat();
-          const userId = parenthesisUserData.slice(-1)[0];
+          const userId = usersPlan[up][0].substring(usersPlan[up][0].lastIndexOf("(") + 1, usersPlan[up][0].lastIndexOf(")"));
           if (teamUsers[tu]["id"] == userId) {
             // Logger.log("bingo! comparing user id: "+JSON.stringify(teamUsers[tu])+" with users plan id: "+userId);
             SpreadsheetApp.getActive()
@@ -239,8 +262,8 @@ function cellChange() {
     // ss.getRange(20,1).setValue("test: "+ ss.getRange(2,range.getColumn()).getValue());
     const cellTeam = ss.getRange(1, range.getColumn()).getValue();
     const cellUser = ss.getRange(range.getRow(), 1).getValue();
-    const aircallUserId = [...cellUser.matchAll(reParenthesis)].flat().slice(-1)[0];
-    const aircallTeamId = [...cellTeam.matchAll(reParenthesis)].flat().slice(-1)[0];
+    const aircallUserId = cellUser.substring(cellUser.lastIndexOf("(") + 1, cellUser.lastIndexOf(")"));
+    const aircallTeamId = cellTeam.substring(cellTeam.lastIndexOf("(") + 1, cellTeam.lastIndexOf(")"));
     if (aircallUserId == "") ui.alert("User Name and ID is not correctly formatted. Please create and sync the team plan again");
     // add user to team
     else if (cellValue === "Logged In") {
