@@ -40,7 +40,7 @@ async function listRecords(object) {
         records = res[object];
         // Logger.log(res.meta);
         if (res.meta["next_page_link"] != null) {
-          for (let p = 2; p < Math.ceil(res.meta["total"] / 50); p++) {
+          for (let p = 2; p <= Math.ceil(res.meta["total"] / 50); p++) {
             req = await UrlFetchApp.fetch(baseUrl + object + "?per_page=50&page=" + p, {
               method: "GET", // *GET, POST, PUT, DELETE, etc.
               headers: {
