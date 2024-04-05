@@ -1,7 +1,7 @@
 // base information
 const baseUrl = "https://api.aircall.io/v1/";
 const apiId = "<Aircall API ID>";
-const apiToken = "<Aircall API Token></Aircall>";
+const apiToken = "<Aircall API Token>";
 const auth = btoa(apiId + ":" + apiToken);
 // check if API Token are working correctly
 console.log("apiId: " + apiId + " Token: " + apiToken + "\n" + auth);
