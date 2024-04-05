@@ -15,7 +15,7 @@ For these use cases, please see all the available Google App & Microsoft Excel S
 
 ## Google Sheets
 
-### <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/baseProperties.js" target="_blank">Base Properties</a>
+### <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Google%20Sheets/baseProperties.js" target="_blank">Base Properties</a>
 
 We recommend you to work with <a href="https://developers.google.com/apps-script/guides/properties" target="_blank">Google's script properties</a> to provide a bit of security in the scripts. For the Aircall connection, a set of <a href="https://support.aircall.io/hc/en-gb/articles/10375354348829-Integrations-and-API" target="_blank">API ID and Secret</a> needs to created in the Aircall Dashboard.
 
@@ -28,7 +28,7 @@ const apiToken = scriptProperties.getProperty("apiToken");
 Additionally, you can add active or particular sheets to the base properties to reference in the other functions.
 <br>
 
-### <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/supportFunctions.js" target="_blank">Support Functions</a>
+### <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Google%20Sheets/supportFunctions.js" target="_blank">Support Functions</a>
 
 The support functions incorporate:
 <br>👉 generic functions for CRUD actions
@@ -39,7 +39,7 @@ The support functions incorporate:
 <br>👉 example of a <a href="https://developers.google.com/apps-script/guides/menus" target="_blank">Google custom menu</a> and <a href="https://developers.google.com/apps-script/guides/dialogs" target="_blank">Google sidebar</a> functions
 <br>
 
-### <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/softphone.html" target="_blank">HTML Sidebars</a>
+### <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Google%20Sheets/softphone.html" target="_blank">HTML Sidebars</a>
 
 Google Sheets offers the ability for small <a href="https://developers.google.com/apps-script/guides/dialogs" target="_blank">HTML sidebars</a> that can interact with the spreadsheet. This can be used as HTML form to control import and export of data but also to embed the Aircall Softphone like:
 
@@ -60,14 +60,14 @@ function showAircallSoftphone() {
 That function can be connected to a custom menu to allow the user to open the sidebar on click but it is also possible to add it to the `onOpen()` function to open up immediately.
 <br><br>
 
-## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/clickToCallDial.js" target="_blank">Click To Dial / Call</a>
+## <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Google%20Sheets/clickToCallDial.js" target="_blank">Click To Dial / Call</a>
 
 The functions for click to dial and click to call work with the following Aircall APIs:
 <br>👉 dial the phone number in the Softphone using the <a href="https://developer.aircall.io/api-references/#dial-a-phone-number-in-the-phone" target="_blank">Aircall Dial a Number API</a>
 <br>👉 call the phone number with the Softphone using the <a href="https://developer.aircall.io/api-references/#start-an-outbound-call" target="_blank">Aircall Start an outbound Call API</a>
 <br><br>
 
-## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/dialerCampaign.js" target="_blank">Dialer Campaigns</a>
+## <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Google%20Sheets/dialerCampaign.js" target="_blank">Dialer Campaigns</a>
 
 To load a list of phone numbers to call one after the other, a Dialer Campaign is availabe with the Aircall Softphone. The functions will take a selection of Google Sheet cells and add all numbers in that order into an Aircall Dialer Campaign.
 To start the copy over into a Dialer Campaign, an example of a custom menu is added:
@@ -95,7 +95,7 @@ const userDict = [
 
 <br>
 
-## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/userImporter.js" target="_blank">User Importer</a>
+## <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Google%20Sheets/userImporter.js" target="_blank">User Importer</a>
 
 When many users need to be created, this script will allow you to:
 <br>👉 make a CSV file
@@ -116,7 +116,7 @@ const payloadBody = {
 Additional settings such as `role_ids`, `is_admin` and `availability_status` can be added to the Google Sheet as columns to further customise the creation of each user.
 <br><br>
 
-## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/userImporter.js" target="_blank">Contact Importer</a>
+## <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Google%20Sheets/userImporter.js" target="_blank">Contact Importer</a>
 
 When many contacts need to be created, this script will allow you to:
 <br>👉 make/import a CSV file
@@ -137,7 +137,7 @@ if (record["company"] != null) payloadBody.company_name = record["company"];
 Additional settings such as `role_ids`, `is_admin` and `availability_status` can be added to the Google Sheet as columns to further customise the creation of each user.
 <br><br>
 
-## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/callImporter.js" target="_blank">Call Importer</a>
+## <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Google%20Sheets/callImporter.js" target="_blank">Call Importer</a>
 
 Reporting on calls with Aircall can be done from within the Aircall Dashboard but if you want more flexibility on reports, you can download the Aircall Call data via the <a href="https://developer.aircall.io/api-references/#search-calls" target="_blank">Aircall Search Calls API</a>.
 The call data will follow the data structure of the Aircall call data and additional columns that are derived from the Aircall data can be added to the spreadsheet like:
@@ -209,7 +209,7 @@ else getAll("calls", dateTimeNowMinus1DayInSeconds, dateTimeNowInSeconds, false)
 This function will set the `FROM` and `TO` in the Aircall Search Calls API to download call data from the last hour then combined with an hourly Google App Scripts trigger. This is the most frequent time trigger that can be set up and will make the Google Sheet maximum 1 hour delayed.
 <br><br>
 
-## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/teamManagement.js" target="_blank">Team Management</a>
+## <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Google%20Sheets/teamManagement.js" target="_blank">Team Management</a>
 
 Aircall allows supervisors and admins to change the agents within the ringing teams. If each agent can easily change whether to be part of ringing groups without opening up all the permissions in Aircall, a Google Sheet with team management can be created.
 
@@ -223,7 +223,7 @@ In this particular script, the cell value needs to be `Logged In` or `Logged Out
 
 ## Microsoft Excel
 
-## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/teamManagement.js" target="_blank">Team Management</a>
+## <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/tree/baseline/Microsoft%20Excel" target="_blank">Team Management</a>
 
 Aircall allows supervisors and admins to change the agents within the ringing teams. If each agent can easily change whether to be part of ringing groups without opening up all the permissions in Aircall, a Excel Workbook with team management can be created.
 
@@ -232,5 +232,12 @@ The Excel Workbook will allow agents to edit whether they are part of a team wit
 <br>👉 remove a user via the <a href="https://developer.aircall.io/api-references/#remove-a-user-from-a-team" target="_blank">Aircall Remove a User from a Team API</a>
 For this is needed to make a list of users and teams so that the Aircall API knows which Aircall User ID needs to be removed from which Aircall Team ID.
 Additionally, it is needed to have a table overview with users and teams on individual axes and have a specific cell value to use as trigger.
-Microsoft Excel does not support cell change as a trigger for a script. The recommended solution is to connect the logIn_logOut script with a button in the worksheet.
+
+The steps to create this Team Management Worksheet are as follows:
+<br>👉 <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Microsoft%20Excel/syncUsers.ts" target="_blank">sync all Aircall users</a> via the <a href="https://developer.aircall.io/api-references/#list-all-users" target="_blank">Aircall List all Users API</a> to a worksheet
+<br>👉 <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Microsoft%20Excel/syncTeams.ts" target="_blank">sync all Aircall teams</a> via the <a href="https://developer.aircall.io/api-references/#list-all-teams" target="_blank">Aircall List all Teams API</a> to a worksheet
+<br>👉 <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Microsoft%20Excel/createTeamManagement.ts" target="_blank">create the team plan</a>, the table with the overview of all teams and users to a worksheet
+<br>👉 <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Microsoft%20Excel/syncTeamManagement.ts" target="_blank">sync all the Aircall users per team</a> via the <a href="https://developer.aircall.io/api-references/#retrieve-a-team" target="_blank">Aircall Retrieve a Team API</a> to the team plan worksheet
+
+Microsoft Excel does not support cell change as a trigger for a script. The recommended solution is to connect <a href="https://github.com/aircallSolutionsEngineering/spreadsheets/blob/baseline/Microsoft%20Excel/logIn_logOut.ts" target="_blank">the logIn_logOut script</a> with a button in the worksheet.
 In this particular script, the cell value needs to be `Logged In` or `Logged Out` and a button click to make the script trigger change in Aircall.
