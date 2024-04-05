@@ -216,6 +216,7 @@ Aircall allows supervisors and admins to change the agents within the ringing te
 The Google Sheet will allow agents to edit whether they are part of a team with a simple cell change. The Google Sheet will execute this change in Aircall using:
 <br>👉 add a users via the <a href="https://developer.aircall.io/api-references/#add-a-user-to-a-team" target="_blank">Aircall Add a User to a Team API</a>
 <br>👉 remove a user via the <a href="https://developer.aircall.io/api-references/#remove-a-user-from-a-team" target="_blank">Aircall Remove a User from a Team API</a>
+
 For this is needed to make a list of users and teams so that the Aircall API knows which Aircall User ID needs to be removed from which Aircall Team ID.
 Additionally, it is needed to have a table overview with users and teams on individual axes and have a specific cell value to use as trigger.
 Google Apps Scripts allows to use `onEdit()` function but it has a limitation: it cant execute Fetch API requests in that function. Because it is needed to send the data to the Aircall API, a different function name is selected and a Google Apps Script trigger based upon a change in Spreadsheet.
@@ -230,6 +231,7 @@ Aircall allows supervisors and admins to change the agents within the ringing te
 The Excel Workbook will allow agents to edit whether they are part of a team with a simple cell change. The Excel Workbook will execute this change in Aircall using:
 <br>👉 add a users via the <a href="https://developer.aircall.io/api-references/#add-a-user-to-a-team" target="_blank">Aircall Add a User to a Team API</a>
 <br>👉 remove a user via the <a href="https://developer.aircall.io/api-references/#remove-a-user-from-a-team" target="_blank">Aircall Remove a User from a Team API</a>
+
 For this is needed to make a list of users and teams so that the Aircall API knows which Aircall User ID needs to be removed from which Aircall Team ID.
 Additionally, it is needed to have a table overview with users and teams on individual axes and have a specific cell value to use as trigger.
 
