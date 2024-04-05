@@ -1,6 +1,6 @@
-# Google App Scripts (for Google Sheets)
+# Spreadsheet Scripts (for Google Sheets & Microsoft Excel)
 
-Welcome to the Google Apps Scripts in collaboration with <a href="https://developer.aircall.io/api-references/" target="_blank">Aircall</a>. To integrate Aircall functionalities with Google Sheets, we offer the following functions and pages.
+Welcome to the Spreadsheet Scripts in collaboration with <a href="https://developer.aircall.io/api-references/" target="_blank">Aircall</a>. To integrate Aircall functionalities with Google Sheets or Microsoft Excel, we offer the following functions and pages.
 <br><br>
 
 ## Introduction</a>
@@ -10,8 +10,10 @@ Aircall is a cloud based telephony provider with a Softphone that can be used by
 <br>👉 want to review the calls they made
 <br>👉 want to help out other teams in handling inbound call volume
 
-For these use cases, please see all the available Google App Scripts and automate processes with Aircall from within a Google Sheet.
+For these use cases, please see all the available Google App & Microsoft Excel Scripts and automate processes with Aircall from within a spreadsheet.
 <br>
+
+## Google Sheets
 
 ### <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/baseProperties.js" target="_blank">Base Properties</a>
 
@@ -218,3 +220,17 @@ For this is needed to make a list of users and teams so that the Aircall API kno
 Additionally, it is needed to have a table overview with users and teams on individual axes and have a specific cell value to use as trigger.
 Google Apps Scripts allows to use `onEdit()` function but it has a limitation: it cant execute Fetch API requests in that function. Because it is needed to send the data to the Aircall API, a different function name is selected and a Google Apps Script trigger based upon a change in Spreadsheet.
 In this particular script, the cell value needs to be `Logged In` or `Logged Out` to make the individual agent be added or removed from the team. With a cell value changing to `Inactive` all agents in the team are removed.
+
+## Microsoft Excel
+
+## <a href="https://github.com/aircallSolutionsEngineering/googleSheets/blob/baseline/teamManagement.js" target="_blank">Team Management</a>
+
+Aircall allows supervisors and admins to change the agents within the ringing teams. If each agent can easily change whether to be part of ringing groups without opening up all the permissions in Aircall, a Excel Workbook with team management can be created.
+
+The Excel Workbook will allow agents to edit whether they are part of a team with a simple cell change. The Excel Workbook will execute this change in Aircall using:
+<br>👉 add a users via the <a href="https://developer.aircall.io/api-references/#add-a-user-to-a-team" target="_blank">Aircall Add a User to a Team API</a>
+<br>👉 remove a user via the <a href="https://developer.aircall.io/api-references/#remove-a-user-from-a-team" target="_blank">Aircall Remove a User from a Team API</a>
+For this is needed to make a list of users and teams so that the Aircall API knows which Aircall User ID needs to be removed from which Aircall Team ID.
+Additionally, it is needed to have a table overview with users and teams on individual axes and have a specific cell value to use as trigger.
+Microsoft Excel does not support cell change as a trigger for a script. The recommended solution is to connect the logIn_logOut script with a button in the worksheet.
+In this particular script, the cell value needs to be `Logged In` or `Logged Out` and a button click to make the script trigger change in Aircall.
