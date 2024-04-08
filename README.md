@@ -1,4 +1,6 @@
-# Spreadsheet Scripts (for Google Sheets & Microsoft Excel)
+# Spreadsheet Scripts
+
+## for Google Sheets & Microsoft Excel
 
 Welcome to the Spreadsheet Scripts in collaboration with <a href="https://developer.aircall.io/api-references/" target="_blank">Aircall</a>. To integrate Aircall functionalities with Google Sheets or Microsoft Excel, we offer the following functions and pages.
 <br><br>
