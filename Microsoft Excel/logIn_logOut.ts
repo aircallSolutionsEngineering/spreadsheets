@@ -29,10 +29,10 @@ function main(workbook: ExcelScript.Workbook) {
   // if user sets itself to log in or log out
   if (cellValue === "Logged Out" || cellValue === "Logged In") {
     // ss.getRangeByIndexes(20,1).setValue("test: "+ ss.getRangeByIndexes(2,range.getColumn()).getValue());
-    const cellTeam: string = workbook.getActiveWorksheet().getRangeByIndexes(0, range.getColumnCount(), 1, 1).getValue();
-    const cellUser: string = workbook.getActiveWorksheet().getRangeByIndexes(range.getRowCount(), 0, 1, 1).getValue();
-    const aircallUserId = cellUser.substring(cellUser.lastIndexOf("(") + 1, cellUser.lastIndexOf(")"));
-    const aircallTeamId = cellTeam.substring(cellTeam.lastIndexOf("(") + 1, cellTeam.lastIndexOf(")"));
+    const cellTeam: string | number | boolean = workbook.getActiveWorksheet().getRangeByIndexes(0, range.getColumnCount(), 1, 1).getValue();
+    const cellUser: string | number | boolean = workbook.getActiveWorksheet().getRangeByIndexes(range.getRowCount(), 0, 1, 1).getValue();
+    const aircallUserId = (cellUser as string).substring((cellUser as string).lastIndexOf("(") + 1, (cellUser as string).lastIndexOf(")"));
+    const aircallTeamId = (cellTeam as string).substring((cellTeam as string).lastIndexOf("(") + 1, (cellTeam as string).lastIndexOf(")"));
     if (aircallUserId == "") console.log("User Name and ID is not correctly formatted. Please create and sync the team plan again");
     // add user to team
     else if (cellValue === "Logged In") {

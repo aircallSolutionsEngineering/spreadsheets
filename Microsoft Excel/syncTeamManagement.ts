@@ -12,11 +12,11 @@ async function main(workbook: ExcelScript.Workbook) {
   const teamPlanTab = workbook.getWorksheet("team plan");
   // clean log in/out
   if (teamPlanTab != null) {
-    teamPlanTab.getRangeByIndexes(1, 1, teamPlanTab.getUsedRange().getRowCount(), teamPlanTab.getUsedRange().getColumnCount()).clear();
+    teamPlanTab.getRangeByIndexes(1, 2, teamPlanTab.getUsedRange().getRowCount(), teamPlanTab.getUsedRange().getColumnCount()).clear();
   }
   const teamsPlan = workbook
     .getWorksheet("team plan")
-    .getRangeByIndexes(0, 1, 1, workbook.getWorksheet("team plan").getUsedRange().getColumnCount() - 1)
+    .getRangeByIndexes(0, 2, 1, workbook.getWorksheet("team plan").getUsedRange().getColumnCount() - 1)
     .getValues();
   const usersPlan = workbook
     .getWorksheet("team plan")
@@ -60,11 +60,11 @@ async function main(workbook: ExcelScript.Workbook) {
             // console.log("bingo! comparing user id: "+JSON.stringify(teamUsers[tu])+" with users plan id: "+userId);
             workbook
               .getWorksheet("team plan")
-              .getRangeByIndexes(up + 1, tp + 1, 1, 1)
+              .getRangeByIndexes(up + 1, tp + 2, 1, 1)
               .setValue("Logged In");
             workbook
               .getWorksheet("team plan")
-              .getRangeByIndexes(up + 1, tp + 1, 1, 1)
+              .getRangeByIndexes(up + 1, tp + 2, 1, 1)
               .getFormat()
               .getFill()
               .setColor(aircallColor);
