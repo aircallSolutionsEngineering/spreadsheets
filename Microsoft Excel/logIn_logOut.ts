@@ -20,7 +20,7 @@ async function changeTeam(teamId: string, userId: string, method: string) {
   if (req.status !== 200 && req.status !== 201) console.log("👎👎👎Error👎👎👎\r\nIssue with " + method + " to a team\r\n\r\n" + req.body);
 }
 
-function main(workbook: ExcelScript.Workbook) {
+async function main(workbook: ExcelScript.Workbook) {
   // onEdit function that is triggered using a scheduled onEdit trigger
   // get value of the cell
   const range = workbook.getActiveCell();
@@ -36,12 +36,12 @@ function main(workbook: ExcelScript.Workbook) {
     if (aircallUserId == "") console.log("User Name and ID is not correctly formatted. Please create and sync the team plan again");
     // add user to team
     else if (cellValue === "Logged In") {
-      changeTeam(aircallTeamId, aircallUserId, "POST");
+      await changeTeam(aircallTeamId, aircallUserId, "POST");
       range.getFormat().getFill().setColor(aircallColor);
     }
     // remove user from team
     else if (cellValue === "Logged Out") {
-      changeTeam(aircallTeamId, aircallUserId, "DELETE");
+      await changeTeam(aircallTeamId, aircallUserId, "DELETE");
       range.getFormat().getFill().setColor("red");
     }
   }
