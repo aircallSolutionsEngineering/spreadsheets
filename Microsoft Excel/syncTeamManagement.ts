@@ -40,9 +40,10 @@ async function main(workbook: ExcelScript.Workbook) {
       });
       const res: object = await req.json();
       // console.log(req.status+" data: "+res);
-      if (req.status !== 200) console.log("👎👎👎Error👎👎👎\r\nCant grab all the team users\r\n\r\n" + req.body);
+      if (req.status !== 200 || res["team"]["users"] == undefined) console.log("👎👎👎Error👎👎👎\r\nCant grab all the team users\r\n\r\n" + req.body);
       else {
-        teamUsers = res["team"]["users"];
+        if (res["team"]["users"] === undefined) teamUsers = [];
+        else teamUsers = res["team"]["users"];
       }
     } catch (error) {
       console.log("👎👎👎Error👎👎👎\r\nCant list the team\r\n\r\n" + error);
@@ -81,5 +82,5 @@ async function main(workbook: ExcelScript.Workbook) {
   const logInLogOutRule: ExcelScript.DataValidationRule = {
     list: logInLogOutCriteria,
   };
-  teamPlanTab.getRangeByIndexes(1, 1, usersPlan.length, teamsPlan[0].length).getDataValidation().setRule(logInLogOutRule);
+  teamPlanTab.getRangeByIndexes(1, 2, usersPlan.length, teamsPlan[0].length).getDataValidation().setRule(logInLogOutRule);
 }

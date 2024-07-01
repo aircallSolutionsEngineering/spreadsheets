@@ -23,7 +23,7 @@ function main(workbook: ExcelScript.Workbook) {
     teamData.push(teamRow);
   }
   // console.log("size: " + teamData.length + " teams: " + teamData);
-  teamPlanTab.getRangeByIndexes(0, 1, 1, 1).setValue(["status"]);
+  teamPlanTab.getRangeByIndexes(0, 1, 1, 1).setValue("status");
   teamPlanTab.getRangeByIndexes(0, 2, 1, teams.length).setValues([teamData]);
   // create complete sheet with log in / log out
 

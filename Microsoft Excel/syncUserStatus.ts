@@ -18,22 +18,23 @@ async function main(workbook: ExcelScript.Workbook) {
     // console.log(userName);
     const userId: string = userName.substring(userName.lastIndexOf("(") + 1, userName.lastIndexOf(")"));
     // console.log(userId);
-    for(let ul = 0; ul < (userList as string[]).length; ul++) {
+    for (let ul = 0; ul < (userList as string[]).length; ul++) {
       if ((userList as string[])[ul]["id"] == userId) {
         // console.log("bingo! comparing user id: "+JSON.stringify(userList[ul])+" with users plan id: "+userId);
-        if((userList as string[])[ul]["available"] === false) {
+        if ((userList as string[])[ul]["available"] === false) {
           workbook
-          .getWorksheet("team plan")
-          .getRangeByIndexes(up + 1, 1, 1, 1)
-          .setValue("unavailable");
+            .getWorksheet("team plan")
+            .getRangeByIndexes(up + 1, 1, 1, 1)
+            .setValue("unavailable");
         } else {
           workbook
-          .getWorksheet("team plan")
-          .getRangeByIndexes(up + 1, 1, 1, 1)
-          .setValue("available");
+            .getWorksheet("team plan")
+            .getRangeByIndexes(up + 1, 1, 1, 1)
+            .setValue("available");
         }
         break;
       }
+    }
   }
 }
 

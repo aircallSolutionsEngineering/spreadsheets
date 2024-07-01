@@ -38,7 +38,7 @@ async function main(workbook: ExcelScript.Workbook) {
     // console.log(startingCell);
     for (let cl = 0; cl < numberOfColumns; cl++) {
       for (let r = 0; r < numberOfRows; r++) {
-        const nextRowCell: string = workbook.getActiveWorksheet().getRange(startingCell).getOffsetRange(cl, r).getAddress();
+        const nextRowCell: string = workbook.getActiveWorksheet().getRange(startingCell).getOffsetRange(r, cl).getAddress();
         rangeCells.push(nextRowCell);
       }
     }
